@@ -43,25 +43,8 @@ fun AppNavigation(viewModel: ProductViewModel) {
             arguments = listOf(navArgument("productId") { type = NavType.StringType })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId") ?: ""
-            DetailsScreen(productId = productId)
+            DetailsScreen(productId = productId, viewModel = viewModel)
         }
     }
 }
 
- /* Deprecated */
-@Composable
-fun HomeScreenDeprecated(onNavigateToDetails: (String) -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Bienvenue sur HomeScreen")
-        Spacer(modifier = Modifier.height(20.dp))
-        Button(onClick = { onNavigateToDetails("PR1234") }) {
-            Text(text = "Aller aux détails du produit PR1234")
-        }
-    }
-}
