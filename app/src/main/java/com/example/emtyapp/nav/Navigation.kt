@@ -1,18 +1,10 @@
 package com.example.emtyapp.nav
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.material3.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
-import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-
 import com.example.emtyapp.ui.LoginScreen
 import com.example.emtyapp.ui.cart.CartScreen
 import com.example.emtyapp.ui.cart.ConfirmationScreen
