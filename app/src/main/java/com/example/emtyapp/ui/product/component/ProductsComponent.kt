@@ -1,5 +1,6 @@
 package com.example.emtyapp.ui.product.component
 
+import ProductItem
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,14 +12,16 @@ import com.example.emtyapp.data.Entities.Product
 
 
 @Composable
-fun ProductsList(products: List<Product>, onNavigateToDetails: (String) -> Unit) {
-    LazyColumn (
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ){
+fun ProductsList(
+    products: List<Product>,
+    onNavigateToDetails: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize()
+    ) {
         items(products) { product ->
-            ProductItem(product, onNavigateToDetails)
+            ProductItem(product = product, onNavigateToDetails = onNavigateToDetails)
         }
     }
 }

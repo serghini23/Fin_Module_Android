@@ -18,6 +18,17 @@ class ProductViewModel @Inject constructor(
     private val _state = MutableStateFlow(ProductViewState())
     val state: StateFlow<ProductViewState> = _state
 
+    private val _cartItems = MutableStateFlow<List<Product>>(emptyList())
+    val cartItems: StateFlow<List<Product>> = _cartItems
+
+    fun addToCart(product: Product) {
+        _cartItems.value = _cartItems.value + product
+    }
+
+    fun removeFromCart(productId: Int) {
+        _cartItems.value = _cartItems.value.filterNot { it.id == productId }
+    }
+
     fun handleIntent(intent: ProductIntent) {
         when (intent) {
             is ProductIntent.LoadProducts -> {
@@ -27,10 +38,10 @@ class ProductViewModel @Inject constructor(
             }
         }
     }
+
     fun getProductById(id: Int): Product? {
         return _state.value.products.find { it.id == id }
     }
-
 
     private suspend fun loadProducts() {
         _state.value = _state.value.copy(isLoading = true, error = null)
@@ -38,8 +49,11 @@ class ProductViewModel @Inject constructor(
             val products = repository.getProducts()
             _state.value = ProductViewState(isLoading = false, products = products)
         } catch (e: Exception) {
-            _state.value =
-                ProductViewState(isLoading = false, error = e.message ?: "Error fetching products")
+            _state.value = ProductViewState(
+                isLoading = false,
+                error = e.message ?: "Error fetching products"
+            )
         }
     }
 }
+
