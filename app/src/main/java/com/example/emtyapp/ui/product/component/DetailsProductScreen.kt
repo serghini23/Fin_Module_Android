@@ -13,9 +13,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.emtyapp.ui.product.ProductViewModel
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+
 
 @Composable
-fun DetailsScreen(productId: String, viewModel: ProductViewModel) {
+fun DetailsScreen(
+    productId: String,
+    viewModel: ProductViewModel,
+    onAddToCart: () -> Unit
+) {
     val product = remember(productId) {
         viewModel.getProductById(productId.toIntOrNull() ?: -1)
     }
@@ -37,6 +44,13 @@ fun DetailsScreen(productId: String, viewModel: ProductViewModel) {
             Text(text = "💰 ${product.price} $")
             Text(text = "📂 Catégorie: ${product.category}")
             Text(text = "⭐ Note: ${product.rating.rate} (${product.rating.count} avis)")
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(onClick = onAddToCart) {
+                Text("Ajouter au Panier 🛒")
+            }
         }
     }
 }
+

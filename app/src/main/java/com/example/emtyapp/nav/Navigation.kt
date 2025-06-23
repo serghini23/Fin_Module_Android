@@ -1,13 +1,7 @@
 package com.example.emtyapp.nav
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,10 +14,13 @@ import androidx.navigation.navArgument
 import com.example.emtyapp.ui.product.ProductViewModel
 import com.example.emtyapp.ui.product.component.DetailsScreen
 import com.example.emtyapp.ui.product.screens.HomeScreen
+import com.example.emtyapp.ui.cart.CartScreen
+
 
 object Routes {
     const val Home = "home"
     const val ProductDetails = "productDetails"
+    const val Cart = "cart"
 }
 
 @Composable
@@ -43,8 +40,21 @@ fun AppNavigation(viewModel: ProductViewModel) {
             arguments = listOf(navArgument("productId") { type = NavType.StringType })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId") ?: ""
-            DetailsScreen(productId = productId, viewModel = viewModel)
+            DetailsScreen(
+                productId = productId,
+                viewModel = viewModel,
+                onAddToCart = {
+                    navController.navigate("${Routes.Cart}/$productId")
+                }
+            )
+        }
+
+        composable(
+            "${Routes.Cart}/{productId}",
+            arguments = listOf(navArgument("productId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: ""
+            CartScreen(productId = productId, viewModel = viewModel)
         }
     }
 }
-
