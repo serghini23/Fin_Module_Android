@@ -2,6 +2,8 @@ package com.example.emtyapp.ui.product.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +31,10 @@ fun DetailsScreen(
     val isAddedToCart = remember { mutableStateOf(false) }
 
     if (product == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             Text("❌ Produit introuvable", style = MaterialTheme.typography.bodyLarge)
         }
     } else {
@@ -41,14 +46,17 @@ fun DetailsScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
+            val scrollState = rememberScrollState()
+
             Column(
                 modifier = Modifier
+                    .verticalScroll(scrollState)
                     .padding(24.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Product image
+                // Image
                 Image(
                     painter = rememberAsyncImagePainter(product.image),
                     contentDescription = product.title,
@@ -72,7 +80,7 @@ fun DetailsScreen(
                     maxLines = 5
                 )
 
-                // Price + category
+                // Price & info
                 Text(
                     text = "💰 ${product.price} $",
                     fontSize = 20.sp,
@@ -84,6 +92,7 @@ fun DetailsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Buttons
                 if (!isAddedToCart.value) {
                     Button(
                         onClick = {
