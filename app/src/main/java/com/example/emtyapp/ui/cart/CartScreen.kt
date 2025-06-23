@@ -6,6 +6,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.unit.dp
 import com.example.emtyapp.ui.product.ProductViewModel
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
 
 @Composable
 fun CartScreen(productId: String, viewModel: ProductViewModel) {
@@ -14,18 +21,29 @@ fun CartScreen(productId: String, viewModel: ProductViewModel) {
     }
 
     if (product == null) {
-        Text("Aucun produit dans le panier", modifier = Modifier.padding(16.dp))
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("🛒 Le panier est vide", style = MaterialTheme.typography.bodyLarge)
+        }
     } else {
-        Column(
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(16.dp)
+                .fillMaxSize(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            Text("🛒 Produit dans le panier :")
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("📦 ${product.title}")
-            Text("💰 ${product.price} $")
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("🛒 Panier", style = MaterialTheme.typography.headlineSmall)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("📦 ${product.title}", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("💰 ${product.price} $", style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }
+

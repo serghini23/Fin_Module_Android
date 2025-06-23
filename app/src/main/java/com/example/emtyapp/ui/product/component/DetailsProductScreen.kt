@@ -1,56 +1,84 @@
 package com.example.emtyapp.ui.product.component
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.emtyapp.ui.product.ProductViewModel
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-
 
 @Composable
 fun DetailsScreen(
     productId: String,
     viewModel: ProductViewModel,
-    onAddToCart: () -> Unit
+    onAddToCart: () -> Unit,
+    onNavigateHome: () -> Unit,
+    onNavigateToCart: () -> Unit
 ) {
     val product = remember(productId) {
         viewModel.getProductById(productId.toIntOrNull() ?: -1)
     }
 
+    val isAddedToCartState = remember { mutableStateOf(false) }
+    val isAddedToCart = isAddedToCartState.value
+
     if (product == null) {
-        Text("Produit introuvable", modifier = Modifier.padding(16.dp))
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("❌ Produit introuvable", style = MaterialTheme.typography.bodyLarge)
+        }
     } else {
-        Column(
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+                .padding(16.dp)
+                .fillMaxSize(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            Text(text = "📦 ${product.title}")
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "💬 ${product.description}")
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "💰 ${product.price} $")
-            Text(text = "📂 Catégorie: ${product.category}")
-            Text(text = "⭐ Note: ${product.rating.rate} (${product.rating.count} avis)")
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = product.title,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = product.description,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("💰 ${product.price} $", style = MaterialTheme.typography.titleMedium)
+                Text("📂 ${product.category}")
+                Text("⭐ ${product.rating.rate} (${product.rating.count} avis)")
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = onAddToCart) {
-                Text("Ajouter au Panier 🛒")
+                if (!isAddedToCart) {
+                    Button(onClick = {
+                        onAddToCart()
+                        isAddedToCartState.value = true
+                    }) {
+                        Text("Ajouter au Panier 🛒")
+                    }
+                } else {
+                    Text("✅ Ajouté au panier", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(onClick = onNavigateHome) {
+                            Text("🏠 Accueil")
+                        }
+                        Button(onClick = onNavigateToCart) {
+                            Text("🛒 Voir Panier")
+                        }
+                    }
+                }
             }
         }
     }
 }
-

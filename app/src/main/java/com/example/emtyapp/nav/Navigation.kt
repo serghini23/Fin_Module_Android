@@ -44,6 +44,10 @@ fun AppNavigation(viewModel: ProductViewModel) {
                 productId = productId,
                 viewModel = viewModel,
                 onAddToCart = {
+                },
+                onNavigateHome = {
+                },
+                onNavigateToCart = {
                     navController.navigate("${Routes.Cart}/$productId")
                 }
             )
