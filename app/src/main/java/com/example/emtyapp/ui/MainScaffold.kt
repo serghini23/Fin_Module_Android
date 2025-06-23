@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.emtyapp.nav.Routes
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
@@ -18,11 +17,16 @@ fun MainScaffold(
     currentRoute: String,
     content: @Composable () -> Unit
 ) {
-    var isSidebarVisible by remember { mutableStateOf(true) }
+    var isSidebarVisible by remember { mutableStateOf(false) }
 
     Row(modifier = Modifier.fillMaxSize()) {
+
         if (isSidebarVisible) {
-            NavigationRail {
+            NavigationRail(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(72.dp) // optional: fixed width
+            ) {
                 NavigationRailItem(
                     selected = currentRoute == Routes.Home,
                     onClick = { navController.navigate(Routes.Home) },
@@ -32,7 +36,7 @@ fun MainScaffold(
                 NavigationRailItem(
                     selected = currentRoute == Routes.Cart,
                     onClick = { navController.navigate(Routes.Cart) },
-                    icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") },
+                    icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Panier") },
                     label = { Text("Panier") }
                 )
                 NavigationRailItem(
@@ -52,10 +56,10 @@ fun MainScaffold(
 
         Column(modifier = Modifier.weight(1f)) {
             TopAppBar(
-                title = { Text("My App") },
+                title = { Text("Serghini Store") },
                 navigationIcon = {
                     IconButton(onClick = { isSidebarVisible = !isSidebarVisible }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Toggle sidebar")
+                        Icon(Icons.Default.Menu, contentDescription = "Toggle Sidebar")
                     }
                 }
             )
