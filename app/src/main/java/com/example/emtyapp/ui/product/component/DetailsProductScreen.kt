@@ -1,11 +1,17 @@
 package com.example.emtyapp.ui.product.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.emtyapp.ui.product.ProductViewModel
 
 @Composable
@@ -20,8 +26,7 @@ fun DetailsScreen(
         viewModel.getProductById(productId.toIntOrNull() ?: -1)
     }
 
-    val isAddedToCartState = remember { mutableStateOf(false) }
-    val isAddedToCart = isAddedToCartState.value
+    val isAddedToCart = remember { mutableStateOf(false) }
 
     if (product == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -29,43 +34,72 @@ fun DetailsScreen(
         }
     } else {
         Card(
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxSize(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                .fillMaxSize()
         ) {
             Column(
                 modifier = Modifier
                     .padding(24.dp)
-                    .fillMaxWidth(),
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Product image
+                Image(
+                    painter = rememberAsyncImagePainter(product.image),
+                    contentDescription = product.title,
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                // Title
                 Text(
                     text = product.title,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+
+                // Description
                 Text(
                     text = product.description,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 5
                 )
-                Spacer(modifier = Modifier.height(12.dp))
-                Text("💰 ${product.price} $", style = MaterialTheme.typography.titleMedium)
-                Text("📂 ${product.category}")
-                Text("⭐ ${product.rating.rate} (${product.rating.count} avis)")
 
-                Spacer(modifier = Modifier.height(24.dp))
+                // Price + category
+                Text(
+                    text = "💰 ${product.price} $",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text("📂 Catégorie : ${product.category}")
+                Text("⭐ Note : ${product.rating.rate} (${product.rating.count} avis)")
 
-                if (!isAddedToCart) {
-                    Button(onClick = {
-                        onAddToCart()
-                        isAddedToCartState.value = true
-                    }) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (!isAddedToCart.value) {
+                    Button(
+                        onClick = {
+                            onAddToCart()
+                            isAddedToCart.value = true
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Text("Ajouter au Panier 🛒")
                     }
                 } else {
-                    Text("✅ Ajouté au panier", color = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "✅ Ajouté au panier",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
