@@ -65,7 +65,8 @@ fun AppNavigation(viewModel: ProductViewModel = viewModel()) {
         }
 
         composable(Routes.Confirmation) {
-            ConfirmationScreen()
+            ConfirmationScreen(navController = navController)
         }
+
     }
 }
