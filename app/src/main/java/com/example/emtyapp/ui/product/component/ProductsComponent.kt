@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import com.example.emtyapp.data.Entities.Product
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-
-
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Image
+import coil.compose.rememberAsyncImagePainter
 
 
 
@@ -31,36 +31,59 @@ fun ProductsList(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(products) { product ->
-            ProductItem(product = product, onNavigateToDetails = onNavigateToDetails)
+            ProductItem(product = product) {
+                onNavigateToDetails(product.id.toString())
+            }
         }
     }
 }
+
 @Composable
 fun ProductItem(product: Product, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .padding(vertical = 4.dp),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = product.title,
-                style = MaterialTheme.typography.titleMedium
+        Row(modifier = Modifier.padding(16.dp)) {
+            // Product Image
+            Image(
+                painter = rememberAsyncImagePainter(product.image),
+                contentDescription = product.title,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(MaterialTheme.shapes.small),
+                contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = product.description,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Price: $${product.price}",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Product Info
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = product.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = product.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "💰 ${product.price} $",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
+
+

@@ -13,10 +13,7 @@ import com.example.emtyapp.ui.product.component.DetailsScreen
 import com.example.emtyapp.ui.product.screens.HomeScreen
 import com.example.emtyapp.ui.MainScaffold
 import androidx.lifecycle.viewmodel.compose.viewModel
-
-
-
-
+import com.example.emtyapp.ui.RegisterScreen
 
 
 object Routes {
@@ -67,10 +64,17 @@ fun AppNavigation(viewModel: ProductViewModel = viewModel()) {
 
         composable(Routes.Register) {
             MainScaffold(navController, currentRoute) {
-                // TODO: Create RegisterScreen
-                Text("Register Screen")
+                RegisterScreen(
+                    navController = navController,
+                    onRegisterSuccess = {
+                        navController.navigate(Routes.Home) {
+                            popUpTo(Routes.Register) { inclusive = true }
+                        }
+                    }
+                )
             }
         }
+
 
         composable(Routes.Confirmation) {
             MainScaffold(navController, currentRoute) {
