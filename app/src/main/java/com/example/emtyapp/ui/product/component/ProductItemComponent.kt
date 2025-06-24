@@ -6,8 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.emtyapp.data.Entities.Product
@@ -35,13 +35,33 @@ fun ProductItem(product: Product, onNavigateToDetails: (String) -> Unit) {
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = product.title, style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = product.description, maxLines = 2, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = product.description,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "💰 ${product.price} $", style = MaterialTheme.typography.titleMedium)
-            Text(text = "📂 ${product.category}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "⭐ ${product.rating.rate} (${product.rating.count} avis)", style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = "💰 ${product.price} $",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "📂 ${product.category}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "⭐ ${product.rating.rate} (${product.rating.count} avis)",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary
+            )
             Spacer(modifier = Modifier.height(12.dp))
-            Button(onClick = { onNavigateToDetails(product.id.toString()) }) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onNavigateToDetails(product.id.toString()) }
+            ) {
                 Text(text = "Plus de détails...")
             }
         }

@@ -45,38 +45,45 @@ android {
 
 dependencies {
     val nav_version = "2.8.9"
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    // Hilt
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("com.google.dagger:hilt-android:2.56.1")
     ksp("com.google.dagger:hilt-compiler:2.56.1")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
 
+    // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    ksp("androidx.hilt:hilt-compiler:1.2.0")
+    // Compose BOM - use only one (preferably the newer one)
+    implementation(platform("androidx.compose:compose-bom:2024.05.00"))
+
+    // AndroidX Core
+    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.activity:activity-compose:1.7.2")
+
+    // Compose
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.animation:animation")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3-window-size-class") // Optional
+    implementation("androidx.compose.material:material-icons-extended") // For all icons
+
+    // Coil
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+    // DataStore & Coroutines
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
-
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation("androidx.compose.material3:material3:1.1.1")
-    implementation ("androidx.compose.material:material-icons-extended:1.5.0")
-    implementation("io.coil-kt:coil-compose:2.3.0")
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
-
-
+    // Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -8,11 +8,11 @@ import com.example.emtyapp.ui.LoginScreen
 import com.example.emtyapp.ui.cart.CartScreen
 import com.example.emtyapp.ui.cart.ConfirmationScreen
 import com.example.emtyapp.ui.product.ProductViewModel
-import com.example.emtyapp.ui.product.component.DetailsScreen
 import com.example.emtyapp.ui.product.screens.HomeScreen
 import com.example.emtyapp.ui.MainScaffold
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.emtyapp.ui.RegisterScreen
+import  com.example.emtyapp.ui.product.component.DetailsScreen
 
 object Routes {
     const val Home = "home"

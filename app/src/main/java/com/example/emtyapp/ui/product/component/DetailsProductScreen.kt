@@ -1,9 +1,13 @@
 package com.example.emtyapp.ui.product.component
-
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -12,13 +16,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.emtyapp.ui.product.ProductViewModel
-import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextOverflow
+
 
 
 @Composable
@@ -32,15 +44,13 @@ fun DetailsScreen(
     val product = remember(productId) {
         viewModel.getProductById(productId.toIntOrNull() ?: -1)
     }
-
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(if (isPressed) 1.03f else 1f)
     val isAddedToCart = remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     if (product == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("❌ Produit introuvable", style = MaterialTheme.typography.bodyLarge)
         }
     } else {
@@ -56,40 +66,83 @@ fun DetailsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Card(
-                    shape = RoundedCornerShape(24.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 20.dp)
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                            shadowElevation = 12.dp.toPx()
+                            shape = RoundedCornerShape(24.dp)
+                            clip = true
+                        }
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    isPressed = true
+                                    tryAwaitRelease()
+                                    isPressed = false
+                                }
+                            )
+                        },
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(product.image),
-                        contentDescription = product.title,
-                        modifier = Modifier
-                            .height(280.dp)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp)),
-                        contentScale = ContentScale.Crop
-                    )
+                    Box {
+                        Image(
+                            painter = rememberAsyncImagePainter(product.image),
+                            contentDescription = product.title,
+                            modifier = Modifier
+                                .height(280.dp)
+                                .fillMaxWidth(),
+                            contentScale = ContentScale.Crop
+                        )
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f)),
+                                        startY = 0f,
+                                        endY = 280f
+                                    )
+                                )
+                        )
+                        Text(
+                            text = product.title,
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(16.dp),
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                shadow = Shadow(
+                                    color = Color.Black,
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 6f
+                                )
+                            ),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
-                Text(
-                    text = product.title,
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                Spacer(Modifier.height(20.dp))
 
                 Text(
                     text = product.description,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    maxLines = 6
+                    maxLines = 6,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
+
+                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), thickness = 1.dp)
+
+                Spacer(Modifier.height(16.dp))
 
                 Surface(
                     shape = RoundedCornerShape(16.dp),
@@ -117,9 +170,13 @@ fun DetailsScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(Modifier.height(24.dp))
 
-                if (!isAddedToCart.value) {
+                AnimatedVisibility(
+                    visible = !isAddedToCart.value,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
                     Button(
                         onClick = {
                             onAddToCart()
@@ -128,43 +185,59 @@ fun DetailsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
                         Text(
                             "Ajouter au Panier 🛒",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                         )
                     }
-                } else {
-                    Text(
-                        "✅ Ajouté au panier",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                }
+
+                AnimatedVisibility(
+                    visible = isAddedToCart.value,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateContentSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        OutlinedButton(
-                            onClick = onNavigateHome,
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.weight(1f).padding(end = 8.dp)
+                        Text(
+                            "✅ Ajouté au panier",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.ExtraBold,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Icon(Icons.Default.Home, contentDescription = "Accueil")
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Accueil")
-                        }
-                        Button(
-                            onClick = onNavigateToCart,
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.weight(1f).padding(start = 8.dp)
-                        ) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = "Panier")
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Voir Panier")
+                            OutlinedButton(
+                                onClick = onNavigateHome,
+                                shape = RoundedCornerShape(24.dp),
+                                modifier = Modifier.weight(1f).padding(end = 8.dp)
+                            ) {
+                                Icon(Icons.Default.Home, contentDescription = "Accueil")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Accueil")
+                            }
+                            Button(
+                                onClick = onNavigateToCart,
+                                shape = RoundedCornerShape(24.dp),
+                                modifier = Modifier.weight(1f).padding(start = 8.dp)
+                            ) {
+                                Icon(Icons.Default.ShoppingCart, contentDescription = "Panier")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Voir Panier")
+                            }
                         }
                     }
                 }

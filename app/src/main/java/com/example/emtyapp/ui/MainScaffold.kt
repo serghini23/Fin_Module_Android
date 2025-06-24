@@ -61,7 +61,8 @@ fun MainScaffold(
                             }
                         },
                         icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Logout") },
-                        label = { Text("Logout") }
+                        label = { Text("Logout" +
+                                "") }
                     )
                 } else {
                     // Show Login and Register when not logged in

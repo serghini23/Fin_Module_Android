@@ -3,23 +3,26 @@ package com.example.emtyapp.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
+import kotlinx.coroutines.launch
 import com.example.emtyapp.UserPrefs
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
+    navController: androidx.navigation.NavController,
     onLoginSuccess: () -> Unit
 ) {
     val context = LocalContext.current
@@ -37,7 +40,7 @@ fun LoginScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
     ) {
         Column(
             modifier = Modifier
@@ -46,13 +49,28 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Connexion", style = MaterialTheme.typography.headlineMedium)
-            Spacer(modifier = Modifier.height(16.dp))
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(72.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = "Connexion",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(24.dp))
 
             if (isLoggedIn) {
-                // Show Logout UI when logged in
-                Text("Vous êtes connecté.", style = MaterialTheme.typography.bodyLarge)
-                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Vous êtes connecté.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(Modifier.height(16.dp))
                 Button(
                     onClick = {
                         coroutineScope.launch {
@@ -62,26 +80,34 @@ fun LoginScreen(
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large
                 ) {
-                    Text("Se déconnecter")
+                    Text(
+                        "Se déconnecter",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             } else {
-                // Show Login form when NOT logged in
-                TextField(
+                OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
                     modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(Modifier.height(12.dp))
 
-                TextField(
+                OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Mot de passe") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password") },
                     modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -90,16 +116,16 @@ fun LoginScreen(
                                 contentDescription = "Toggle password visibility"
                             )
                         }
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
 
                 Button(
                     onClick = {
                         coroutineScope.launch {
                             val isValid = userPrefs.validateUser(email, password)
                             if (isValid) {
-                                // Save user and mark logged in
                                 userPrefs.saveUser(email, password)
                                 onLoginSuccess()
                             } else {
@@ -108,23 +134,27 @@ fun LoginScreen(
                         }
                     },
                     enabled = isFormValid,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.large,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Se connecter")
+                    Text(
+                        "Se connecter",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
 
                 errorMessage?.let {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(Modifier.height(12.dp))
                     Text(it, color = MaterialTheme.colorScheme.error)
                 }
-            }
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
-            if (!isLoggedIn) {
-                TextButton(onClick = {
-                    // TODO: Implement "Forgot Password"
-                }) {
+                TextButton(
+                    onClick = { /* TODO: Implement forgot password logic */ }
+                ) {
                     Text("Mot de passe oublié ?", textAlign = TextAlign.Center)
                 }
             }
