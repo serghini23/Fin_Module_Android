@@ -15,33 +15,39 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TopAppBar
-
-
-
-
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
+import com.example.emtyapp.UserPrefs
+import kotlinx.coroutines.launch
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: ProductViewModel = viewModel(), onNavigateToDetails: (String) -> Unit) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: ProductViewModel = viewModel(),
+    onNavigateToDetails: (String) -> Unit
+) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.handleIntent(ProductIntent.LoadProducts)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Produits") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
+    val context = LocalContext.current
+    val userPrefs = remember { UserPrefs(context) }
+    val coroutineScope = rememberCoroutineScope()
 
-        },
+    val isLoggedIn by userPrefs.isLoggedIn.collectAsState(initial = false)
+
+    Scaffold(
+
         content = { paddingValues ->
             Box(
                 modifier = Modifier

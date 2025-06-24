@@ -1,7 +1,6 @@
 package com.example.emtyapp.nav
 
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.*
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -15,7 +14,6 @@ import com.example.emtyapp.ui.MainScaffold
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.emtyapp.ui.RegisterScreen
 
-
 object Routes {
     const val Home = "home"
     const val ProductDetails = "productDetails"
@@ -23,9 +21,6 @@ object Routes {
     const val Confirmation = "confirmation"
     const val Login = "login"
     const val Register = "register"
-
-
-
 }
 
 @Composable
@@ -38,9 +33,13 @@ fun AppNavigation(viewModel: ProductViewModel = viewModel()) {
 
         composable(Routes.Home) {
             MainScaffold(navController, currentRoute) {
-                HomeScreen(viewModel = viewModel, onNavigateToDetails = { productId ->
-                    navController.navigate("${Routes.ProductDetails}/$productId")
-                })
+                HomeScreen(
+                    viewModel = viewModel,
+                    navController = navController, // Pass navController here
+                    onNavigateToDetails = { productId ->
+                        navController.navigate("${Routes.ProductDetails}/$productId")
+                    }
+                )
             }
         }
 
@@ -75,7 +74,6 @@ fun AppNavigation(viewModel: ProductViewModel = viewModel()) {
             }
         }
 
-
         composable(Routes.Confirmation) {
             MainScaffold(navController, currentRoute) {
                 ConfirmationScreen(navController)
@@ -107,4 +105,3 @@ fun AppNavigation(viewModel: ProductViewModel = viewModel()) {
         }
     }
 }
-
