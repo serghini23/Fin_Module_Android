@@ -13,6 +13,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import com.example.emtyapp.UserPrefs
 
 
 @Composable
@@ -23,8 +26,12 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val isFormValid = email.contains("@") && password.length >= 6
+    val context = LocalContext.current
+    val userPrefs = remember { UserPrefs(context) }
+    val coroutineScope = rememberCoroutineScope()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -37,10 +44,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Connexion",
-                style = MaterialTheme.typography.headlineMedium
-            )
+            Text("Connexion", style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(16.dp))
 
             TextField(
@@ -59,29 +63,43 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (passwordVisible)
-                        Icons.Default.Visibility
-                    else Icons.Default.VisibilityOff
-
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = image, contentDescription = if (passwordVisible) "Cacher le mot de passe" else "Afficher le mot de passe")
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = "Toggle password visibility"
+                        )
                     }
                 }
             )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { onLoginSuccess() },
+                onClick = {
+                    coroutineScope.launch {
+                        val isValid = userPrefs.validateUser(email, password)
+                        if (isValid) {
+                            onLoginSuccess()
+                        } else {
+                            errorMessage = "❌ Email ou mot de passe incorrect"
+                        }
+                    }
+                },
                 enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Se connecter")
             }
 
+            errorMessage?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(it, color = MaterialTheme.colorScheme.error)
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = {
-                // TODO: Navigate to register or password recovery
+                // TODO: Implémenter mot de passe oublié
             }) {
                 Text("Mot de passe oublié ?", textAlign = TextAlign.Center)
             }

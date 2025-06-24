@@ -10,6 +10,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.example.emtyapp.UserPrefs
 import kotlinx.coroutines.launch
 
 @Composable
@@ -17,14 +19,17 @@ fun RegisterScreen(
     navController: NavController,
     onRegisterSuccess: () -> Unit
 ) {
+    // Move these here to be in the composable scope:
+    val context = LocalContext.current
+    val userPrefs = remember { UserPrefs(context) }
+    val coroutineScope = rememberCoroutineScope()
+
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
-
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -97,7 +102,7 @@ fun RegisterScreen(
                 isLoading = true
 
                 coroutineScope.launch {
-                    kotlinx.coroutines.delay(1500)
+                    userPrefs.saveUser(email, password)
                     isLoading = false
                     onRegisterSuccess()
                 }
