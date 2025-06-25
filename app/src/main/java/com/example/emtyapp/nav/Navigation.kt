@@ -11,8 +11,10 @@ import com.example.emtyapp.ui.product.ProductViewModel
 import com.example.emtyapp.ui.product.screens.HomeScreen
 import com.example.emtyapp.ui.MainScaffold
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.emtyapp.nav.Routes.OrderHistory
 import com.example.emtyapp.ui.RegisterScreen
 import  com.example.emtyapp.ui.product.component.DetailsScreen
+import com.example.emtyapp.ui.product.component.OrderHistoryScreen
 
 object Routes {
     const val Home = "home"
@@ -21,6 +23,8 @@ object Routes {
     const val Confirmation = "confirmation"
     const val Login = "login"
     const val Register = "register"
+    const val OrderHistory = "orderHistory"
+
 }
 
 @Composable
@@ -42,6 +46,14 @@ fun AppNavigation(viewModel: ProductViewModel = viewModel()) {
                 )
             }
         }
+        composable(Routes.OrderHistory) {
+            MainScaffold(navController, currentRoute) {
+                OrderHistoryScreen(viewModel = viewModel)
+
+
+            }
+        }
+
 
         composable(Routes.Cart) {
             MainScaffold(navController, currentRoute) {

@@ -126,12 +126,16 @@ fun CartScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
-                    onClick = onCheckout,
+                    onClick = {
+                        viewModel.placeOrder()
+                        onCheckout()
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("✅ Passer à la caisse")
                 }
+
             }
-        }
     }
+}
 }

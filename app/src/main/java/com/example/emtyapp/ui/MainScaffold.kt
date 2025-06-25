@@ -12,6 +12,8 @@ import androidx.navigation.NavController
 import com.example.emtyapp.UserPrefs
 import com.example.emtyapp.nav.Routes
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.History
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +44,13 @@ fun MainScaffold(
                     label = { Text("Accueil") }
                 )
                 NavigationRailItem(
+                    selected = currentRoute == Routes.OrderHistory,
+                    onClick = { navController.navigate(Routes.OrderHistory) },
+                    icon = { Icon(Icons.Default.History, contentDescription = "Historique des commandes") },
+                    label = { Text("Historique") }
+                )
+
+                NavigationRailItem(
                     selected = currentRoute == Routes.Cart,
                     onClick = { navController.navigate(Routes.Cart) },
                     icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Panier") },
@@ -49,9 +58,8 @@ fun MainScaffold(
                 )
 
                 if (isLoggedIn) {
-                    // Show Logout item instead of Login/Register
                     NavigationRailItem(
-                        selected = false,  // no need to highlight logout
+                        selected = false,
                         onClick = {
                             coroutineScope.launch {
                                 userPrefs.logout()
@@ -65,7 +73,6 @@ fun MainScaffold(
                                 "") }
                     )
                 } else {
-                    // Show Login and Register when not logged in
                     NavigationRailItem(
                         selected = currentRoute == Routes.Login,
                         onClick = { navController.navigate(Routes.Login) },

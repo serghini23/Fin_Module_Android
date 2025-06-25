@@ -1,7 +1,9 @@
 package com.example.emtyapp.ui.product
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.emtyapp.data.Entities.Order
 import com.example.emtyapp.data.Entities.Product
 import com.example.emtyapp.data.Repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,6 +40,10 @@ class ProductViewModel @Inject constructor(
             }
         }
     }
+    private fun clearCart() {
+        _cartItems.value = emptyList()
+    }
+
 
     fun getProductById(id: Int): Product? {
         return _state.value.products.find { it.id == id }
@@ -53,6 +59,23 @@ class ProductViewModel @Inject constructor(
                 isLoading = false,
                 error = e.message ?: "Error fetching products"
             )
+        }
+    }
+    private var orderCounter = 0
+    private val _orderHistory = mutableStateListOf<Order>()
+    val orderHistory: List<Order> = _orderHistory
+
+    fun placeOrder() {
+        val currentCart = cartItems.value
+        if (currentCart.isNotEmpty()) {
+            _orderHistory.add(
+                Order(
+                    id = orderCounter++,
+                    items = currentCart.toList(),
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+            clearCart()
         }
     }
 }
