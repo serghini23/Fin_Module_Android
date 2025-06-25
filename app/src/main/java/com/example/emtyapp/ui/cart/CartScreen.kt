@@ -6,9 +6,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +20,11 @@ fun CartScreen(
     onCheckout: () -> Unit
 ) {
     val cartItems by viewModel.cartItems.collectAsState()
+    val quantities = remember(cartItems) {
+        mutableStateMapOf<Int, Int>().apply {
+            cartItems.forEach { put(it.id, getOrDefault(it.id, 1)) }
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -27,15 +32,11 @@ fun CartScreen(
     ) {
         if (cartItems.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    "🛒 Le panier est vide",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                )
+                Text("🛒 Le panier est vide", style = MaterialTheme.typography.bodyLarge)
             }
         } else {
-            val totalPrice = cartItems.sumOf { it.price }
-            val itemCount = cartItems.size
+            val totalPrice = cartItems.sumOf { it.price * (quantities[it.id] ?: 1) }
+            val itemCount = cartItems.sumOf { quantities[it.id] ?: 1 }
 
             Column(
                 modifier = Modifier
@@ -47,6 +48,7 @@ fun CartScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
+
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Column(
@@ -55,33 +57,57 @@ fun CartScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
                     cartItems.forEach { product ->
+                        val quantity = quantities[product.id] ?: 1
+
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp),
-                            shape = MaterialTheme.shapes.medium,
                             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
+                                Text("📦 ${product.title}", style = MaterialTheme.typography.titleMedium)
+                                Text("💰 ${product.price} $ / unité", style = MaterialTheme.typography.bodyMedium)
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    IconButton(onClick = {
+                                        if (quantity > 1) {
+                                            quantities[product.id] = quantity - 1
+                                        }
+                                    }) {
+                                        Icon(Icons.Default.Remove, contentDescription = "Diminuer")
+                                    }
+
+                                    Text("$quantity", style = MaterialTheme.typography.titleMedium)
+
+                                    IconButton(onClick = {
+                                        quantities[product.id] = quantity + 1
+                                    }) {
+                                        Icon(Icons.Default.Add, contentDescription = "Augmenter")
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
                                 Text(
-                                    "📦 ${product.title}",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    "🧾 Total pour cet article: ${product.price * quantity} $",
+                                    style = MaterialTheme.typography.bodyLarge
                                 )
-                                Text(
-                                    "💰 ${product.price} $",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+
                                 Spacer(modifier = Modifier.height(12.dp))
+
                                 Button(
                                     onClick = { viewModel.removeFromCart(product.id) },
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                    shape = MaterialTheme.shapes.small,
                                     modifier = Modifier.align(Alignment.End)
                                 ) {
                                     Icon(Icons.Default.Delete, contentDescription = "Supprimer")
-                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Spacer(Modifier.width(6.dp))
                                     Text("Supprimer")
                                 }
                             }
@@ -92,7 +118,7 @@ fun CartScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    "💵 Total : $totalPrice $",
+                    "💵 Total à payer : $totalPrice $",
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -101,15 +127,9 @@ fun CartScreen(
 
                 Button(
                     onClick = onCheckout,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.large,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        "✅ Passer à la caisse",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                    Text("✅ Passer à la caisse")
                 }
             }
         }
